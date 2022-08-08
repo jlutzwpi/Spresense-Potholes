@@ -116,6 +116,12 @@ void printError(enum CamErr err)
   }
 }
 
+// grayscale to rgb
+static inline void mono_to_rgb(uint8_t mono_data, uint8_t *r, uint8_t *g, uint8_t *b) {
+  uint8_t v = mono_data;
+  *r = *g = *b = v;
+}
+
 /* Attach to the LTE network */
 void doAttach()
 {
@@ -174,7 +180,7 @@ int ei_camera_cutout_get_data(size_t offset, size_t length, float *out_ptr) {
     uint8_t pixel = buffer[offset];
 
     uint8_t r, g, b;
-    r,g,b = pixel;
+    mono_to_rgb(pixel, &r, &g, &b);
 
     // then convert to out_ptr format
     float pixel_f = (r << 16) + (g << 8) + b;
@@ -239,13 +245,12 @@ void CamCB(CamImage img)
   }
   String outputStr = "Image input height/width: " + String(sized_img.getHeight()) + ", " +
     String(sized_img.getWidth());
-  err = sized_img.convertPixFormat(CAM_IMAGE_PIX_FMT_JPG);
   Serial.println(outputStr);
-  take_picture_count++;
+  //take_picture_count++;
   
-  err = sized_img.convertPixFormat(CAM_IMAGE_PIX_FMT_RGB565);
+  err = sized_img.convertPixFormat(CAM_IMAGE_PIX_FMT_GRAY);
   if (err) {
-    Serial.println("Convert to RGB error!");
+    Serial.println("Convert to grayscale error!");
     printError(err);
   }
 
@@ -266,7 +271,7 @@ void CamCB(CamImage img)
 void ei_pothole_camera_start_continuous(bool debug) {
   CamErr err;
 
-  err = theCamera.begin(1, CAM_VIDEO_FPS_30, RAW_WIDTH, RAW_HEIGHT);
+  err = theCamera.begin(1, CAM_VIDEO_FPS_5, RAW_WIDTH, RAW_HEIGHT);
   if (err && debug) 
   {
     Serial.println("Camera begin error!");
@@ -322,6 +327,7 @@ void ei_pothole_camera_snapshot(bool debug)
     //mqttClient.print(out);
     mqttClient.endMessage();
     lastPubSec = currentTime;
+    delay(1000);
     numOfPubs++;
   }
   char filename[200];
@@ -346,6 +352,7 @@ void ei_pothole_camera_snapshot(bool debug)
     }
   }
   take_picture_count++;
+  Serial.println("Image count incremented.");
 }
 
 /**
