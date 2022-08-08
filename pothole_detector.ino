@@ -42,7 +42,7 @@
 // RAT to use
 #define APP_LTE_RAT (LTE_NET_RAT_CATM) // RAT : LTE-M (LTE Cat-M1)
 // MQTT broker
-#define BROKER_NAME        "aw5kzq8z8mq4r-ats.iot.us-east-1.amazonaws.com"
+#define BROKER_NAME        "xxxxxxxx-ats.iot.us-east-1.amazonaws.com"
 #define BROKER_PORT        8883               // port 8883 is the default for MQTT over TLS.
 #define MQTT_TOPIC         "pothole/coords"
 // MQTT publish interval settings
